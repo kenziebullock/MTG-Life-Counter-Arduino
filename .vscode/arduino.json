@@ -1,0 +1,4 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "mtg_life_counter/mtg_life_counter.ino"
+}
