@@ -1,4 +1,3 @@
-
 #include <SPI.h>
 #include "Adafruit_GFX.h"
 #include "Adafruit_HX8357.h"
@@ -8,9 +7,9 @@
 #define TFT_DC 9
 #define TFT_RST 8 // RST can be set to -1 if you tie it to Arduino's reset
 
-#define button 3
-#define select 4
-#define down 5
+#define upButton 3
+#define selectButton 4
+#define downButton 5
 
 // Use hardware SPI (on Uno, #13, #12, #11) and the above for CS/DC
 Adafruit_HX8357 tft = Adafruit_HX8357(TFT_CS, TFT_DC, TFT_RST);
@@ -79,7 +78,7 @@ void setup()
 
   Serial.println(F("Done!"));
 
-  pinMode(button, INPUT);
+  pinMode(upButton, INPUT);
 }
 
 bool hasDisplayUpdated;
@@ -112,6 +111,8 @@ int welcome = 1;
 int yoffset = 30;
 int xoffset = 10;
 
+int playerNameTextSize = 2;
+int lifeValueTextSize = 6;
 unsigned int p1color = HX8357_RED;
 unsigned int p2color = HX8357_WHITE;
 unsigned int p3color = HX8357_WHITE;
@@ -129,9 +130,9 @@ void loop()
     welcome = 0;
   }
 
-  buttonState = digitalRead(button);
-  selectState = digitalRead(select);
-  downState = digitalRead(down);
+  buttonState = digitalRead(upButton);
+  selectState = digitalRead(selectButton);
+  downState = digitalRead(downButton);
 
   if (buttonState)
   {
@@ -172,6 +173,7 @@ void updatePlayerDisplayColors()
   p2color = HX8357_WHITE;
   p3color = HX8357_WHITE;
   p4color = HX8357_WHITE;
+
   if (currentPlayer == 1)
   {
     p1color = HX8357_RED;
@@ -204,45 +206,43 @@ void welcomeScreen()
 
 void setupPlayers()
 {
-
   blackOutDisplay();
-  tft.setCursor(70, 0);
+
+  tft.setCursor(player1x, player1y);
   tft.setTextColor(p1color);
-  tft.setTextSize(2);
+  tft.setTextSize(playerNameTextSize);
   tft.println("Player 1");
-  tft.setCursor(70 + xoffset, 0 + yoffset);
-  tft.setTextSize(6);
+  tft.setCursor(player1x + xoffset, player1y + yoffset);
+  tft.setTextSize(lifeValueTextSize);
   tft.println(player1);
 
-  tft.setCursor(260, 0);
+  tft.setCursor(player2x, player2y);
   tft.setTextColor(p2color);
-  tft.setTextSize(2);
+  tft.setTextSize(playerNameTextSize);
   tft.println("Player 2");
-  tft.setCursor(260 + xoffset, 0 + yoffset);
-  tft.setTextSize(6);
+  tft.setCursor(player2x + xoffset, player2y + yoffset);
+  tft.setTextSize(lifeValueTextSize);
   tft.println(player2);
 
-  tft.setCursor(70, 120);
+  tft.setCursor(player3x, player3y);
   tft.setTextColor(p3color);
-  tft.setTextSize(2);
+  tft.setTextSize(playerNameTextSize);
   tft.println("Player 3");
-  tft.setCursor(70 + xoffset, 120 + yoffset);
-  tft.setTextSize(6);
+  tft.setCursor(player3x + xoffset, player3y + yoffset);
+  tft.setTextSize(lifeValueTextSize);
   tft.println(player3);
 
-  tft.setCursor(260, 120);
+  tft.setCursor(player4x, player4y);
   tft.setTextColor(p4color);
-  tft.setTextSize(2);
+  tft.setTextSize(playerNameTextSize);
   tft.println("Player 4");
-  tft.setCursor(260 + xoffset, 120 + yoffset);
-  tft.setTextSize(6);
+  tft.setCursor(player4x + xoffset, player4y + yoffset);
+  tft.setTextSize(lifeValueTextSize);
   tft.println(player4);
 }
 
 void increaseLife()
 {
-  //tft.fillScreen(HX8357_BLACK);
-
   if (currentPlayer == 1)
   {
     prevPlayer1Life = player1;
@@ -267,9 +267,6 @@ void increaseLife()
 
 void decreaseLife()
 {
-  //  tft.fillScreen(HX8357_BLACK);
-  //tft.fillRect(0, 0, 1000, 1000, HX8357_BLACK);
-
   if (currentPlayer == 1)
   {
     prevPlayer1Life = player1;
@@ -296,33 +293,28 @@ void blackOutDisplay()
   if (!hasDisplayUpdated)
   {
     delay(200);
+    tft.setTextSize(6);
+    tft.setTextColor(HX8357_BLACK);
 
     if (currentPlayer == 1)
     {
-      tft.setTextColor(HX8357_BLACK);
-      tft.setCursor(70 + xoffset, 0 + yoffset);
-      tft.setTextSize(6);
+
+      tft.setCursor(player1x + xoffset, player1y + yoffset);
       tft.println(prevPlayer1Life);
     }
     else if (currentPlayer == 2)
     {
-      tft.setTextColor(HX8357_BLACK);
-      tft.setCursor(260 + xoffset, 0 + yoffset);
-      tft.setTextSize(6);
+      tft.setCursor(player2x + xoffset, player2y + yoffset);
       tft.println(prevPlayer2Life);
     }
     else if (currentPlayer == 3)
     {
-      tft.setTextColor(HX8357_BLACK);
-      tft.setCursor(70 + xoffset, 120 + yoffset);
-      tft.setTextSize(6);
+      tft.setCursor(player3x + xoffset, player3y + yoffset);
       tft.println(prevPlayer3Life);
     }
     else
     {
-      tft.setTextColor(HX8357_BLACK);
-      tft.setCursor(260 + xoffset, 120 + yoffset);
-      tft.setTextSize(6);
+      tft.setCursor(player4x + xoffset, player4y + yoffset);
       tft.println(prevPlayer4Life);
     }
     hasDisplayUpdated = true;
